@@ -12,11 +12,11 @@ data class Producto(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val nombre: String,
-    val descripcion: String,
+    val descripcion: String = "",
     val precio: Double,
-    val stock: Int,
-    val categoria: String,
-    val origen: String, // Información extra
+    val stock: Int = 100,
+    val categoria: String = "Frutas y Verduras",
+    val origen: String = "Local", // Información extra
     val imagenUrl: String // Usamos URLs de placeholder por ahora
 )
 
