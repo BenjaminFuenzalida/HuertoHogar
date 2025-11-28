@@ -1,9 +1,23 @@
 package com.example.huertohogar.vistas
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,59 +29,33 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.huertohogar.navegacion.Rutas
 import com.example.huertohogar.ui.theme.HuertoHogarTheme
+import com.example.huertohogar.viewmodel.RegistroViewModel
 
 /**
-* Pantalla de Registro de Usuario.
-* implementación de:
-* - Diseño con Material 3.
-* - Formularios con validación.
-* - Gestión de estado simple.
-* - Navegación funcional.
-*/
-
-
+ * Pantalla de Registro de Usuario.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PantallaRegistro(navController: NavController) {
+fun PantallaRegistro(
+    navController: NavController,
+    viewModel: RegistroViewModel
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
-    // --- Gestión de estado (simple) ---
     var email by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
     var repetirContrasena by remember { mutableStateOf("") }
-    var mensajeError by remember { mutableStateOf<String?>(null) }
 
-    fun validarYRegistrar() {
-        // --- Validación de formulario ---
-        if (email.isBlank() || contrasena.isBlank() || repetirContrasena.isBlank()) {
-            mensajeError = "Todos los campos son obligatorios"
-            return
-        }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            mensajeError = "El correo no es válido"
-            return
-        }
-        if (contrasena != repetirContrasena) {
-            mensajeError = "Las contraseñas no coinciden"
-            return
-        }
-        if (contrasena.length < 6) {
-            mensajeError = "La contraseña debe tener al menos 6 caracteres"
-            return
-        }
-
-        // Si todo es válido:
-        mensajeError = null
-
-        navController.navigate(Rutas.Catalogo.ruta) {
-            // Se limpia la pila de navegación para no poder volver al registro.
-            popUpTo(Rutas.Registro.ruta) { inclusive = true }
+    LaunchedEffect(uiState.registroExitoso) {
+        if (uiState.registroExitoso) {
+            navController.navigate(Rutas.Login.ruta) {
+                popUpTo(Rutas.Registro.ruta) { inclusive = true }
+            }
         }
     }
 
-    // --- UI (Diseño con Material 3) ---
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -118,17 +106,16 @@ fun PantallaRegistro(navController: NavController) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Se Muestra mensaje de error si existe.
-        if (mensajeError != null) {
+        uiState.error?.let {
             Text(
-                text = mensajeError!!,
+                text = it,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
         }
 
         Button(
-            onClick = { validarYRegistrar() },
+            onClick = { viewModel.registrarUsuario(email, contrasena, repetirContrasena) },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -144,12 +131,10 @@ fun PantallaRegistro(navController: NavController) {
     }
 }
 
-
-// --- Preview para ver el diseño sin ejecutar la app ---
 @Preview(showBackground = true)
 @Composable
 fun PreviewPantallaRegistro() {
     HuertoHogarTheme {
-        PantallaRegistro(navController = rememberNavController())
+        // PantallaRegistro(navController = rememberNavController())
     }
 }

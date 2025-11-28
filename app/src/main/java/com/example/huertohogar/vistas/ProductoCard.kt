@@ -49,7 +49,6 @@ fun ProductoCard(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // La imagen del producto (usando Coil).
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(producto.imagenUrl)
@@ -63,7 +62,6 @@ fun ProductoCard(
                     .clip(MaterialTheme.shapes.medium)
             )
 
-            // Contenido de texto.
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -71,7 +69,6 @@ fun ProductoCard(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    // Nombre (color MarronClaro - Título)
                     Text(
                         text = producto.nombre,
                         style = MaterialTheme.typography.titleMedium,
@@ -81,16 +78,21 @@ fun ProductoCard(
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    // Precio (color GrisOscuro - Cuerpo)
                     Text(
                         text = "$${String.format("%,.0f", producto.precio)} CLP / kg",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1
                     )
+
+                    Text(
+                        text = "Stock: ${producto.stock}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1
+                    )
                 }
 
-                // Botón (color VerdeEsmeralda - Primario)
                 Button(
                     onClick = onAgregarClick,
                     modifier = Modifier.fillMaxWidth(),

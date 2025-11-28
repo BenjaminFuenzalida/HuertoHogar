@@ -13,5 +13,6 @@ data class Usuario(
     val email: String,
     val contrasena: String,
     val direccion: String? = null,
-    val numeroContacto: String? = null
+    val numeroContacto: String? = null,
+    val isAdmin: Boolean = false
 )
